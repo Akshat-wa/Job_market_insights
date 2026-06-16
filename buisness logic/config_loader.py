@@ -85,4 +85,22 @@ def load_config(path: str = "config.yaml") -> Dict[str, Any]:
             else:
                 cfg[key] = val
 
+    _apply_llm_env(cfg)
     return cfg
+
+
+def _truthy_env(name: str) -> bool:
+    return os.getenv(name, "").strip().lower() in ("1", "true", "yes")
+
+
+def _apply_llm_env(cfg: dict) -> None:
+    """Let Render/local .env override YAML for LLM without redeploying config.yaml."""
+    llm_cfg = cfg.setdefault("llm", {})
+    if _truthy_env("LLM_ENABLED") or _truthy_env("LLM_LIVE"):
+        llm_cfg["enabled"] = True
+    if _truthy_env("LLM_LIVE"):
+        llm_cfg["use_for_summary"] = True
+    if _truthy_env("LLM_USE_SUMMARY"):
+        llm_cfg["use_for_summary"] = True
+    if os.getenv("LLM_USE_SUMMARY", "").strip().lower() in ("0", "false", "no"):
+        llm_cfg["use_for_summary"] = False

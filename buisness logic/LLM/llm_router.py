@@ -1,7 +1,12 @@
 """Multi-provider LLM router: Gemini → Grok → empty (caller uses SQL/regex fallback)."""
 from __future__ import annotations
 
+import os
 from typing import Any, Dict, List, Optional, Tuple
+
+
+def _env_truthy(name: str) -> bool:
+    return os.getenv(name, "").strip().lower() in ("1", "true", "yes")
 
 
 def _provider_chain(cfg: dict) -> List[str]:
@@ -34,11 +39,12 @@ def _make_llm(provider: str, model: str, json_mode: bool, llm_cfg: dict):
 
 
 def llm_enabled(cfg: dict) -> bool:
+    if _env_truthy("LLM_ENABLED") or _env_truthy("LLM_LIVE"):
+        return bool(_provider_chain(cfg or {}))
     llm_cfg = (cfg or {}).get("llm", {}) or {}
     if not llm_cfg.get("enabled"):
         return False
-    chain = _provider_chain(cfg)
-    return bool(chain)
+    return bool(_provider_chain(cfg))
 
 
 def generate_with_fallback(

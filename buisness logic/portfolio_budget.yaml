@@ -22,10 +22,6 @@ upload:
   max_file_bytes: 5242880   # 5 MB
   max_rows: 5000
 
-# Regex parser first; LLM only when quota allows (free tier ≈ 20 calls/day)
+# Regex parser first locally; production LLM toggled via LLM_LIVE=1 in .env / Render
 parser:
   prefer_llm: false
-
-llm:
-  use_for_summary: false
-  use_for_enrichment: false

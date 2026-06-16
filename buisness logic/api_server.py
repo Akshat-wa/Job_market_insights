@@ -30,7 +30,7 @@ from feedback.capture import capture_failure, feedback_enabled, list_failures, m
 
 load_dotenv()
 
-API_BUILD_ID = "2026-06-14-sql-fallback-v3"
+API_BUILD_ID = "2026-06-16-llm-env-v4"
 CONFIG_PATH = os.getenv("CONFIG_PATH", "config.yaml")
 
 CFG = load_config(CONFIG_PATH)
@@ -263,6 +263,10 @@ def health():
         "api_version": API_BUILD_ID,
         "sql_only_mode": not _llm_live_mode(),
         "llm_enabled": llm_enabled(_runtime_cfg()),
+        "llm_use_for_summary": (_runtime_cfg().get("llm") or {}).get("use_for_summary"),
+        "gemini_key_set": bool(os.getenv("GEMINI_API_KEY")),
+        "xai_key_set": bool(os.getenv("XAI_API_KEY")),
+        "llm_live_env": _llm_live_mode(),
         "time": datetime.now(timezone.utc).isoformat(),
     })
 
