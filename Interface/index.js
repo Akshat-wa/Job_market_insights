@@ -25,6 +25,8 @@ const feedbackCommentWrap = document.getElementById("feedbackCommentWrap");
 const feedbackComment = document.getElementById("feedbackComment");
 const feedbackSubmit = document.getElementById("feedbackSubmit");
 const feedbackStatus = document.getElementById("feedbackStatus");
+const llmStatusBar = document.getElementById("llmStatusBar");
+const llmQueryNotice = document.getElementById("llmQueryNotice");
 
 let sessionId = localStorage.getItem("jmi_session_id") || null;
 let isRunning = false;
@@ -186,6 +188,51 @@ function renderTable(structured) {
     });
 }
 
+function renderLlmStatus(status) {
+    if (!status || !llmStatusBar) return;
+
+    const level = status.level || "off";
+    const msg = status.user_message || "";
+    if (!msg) {
+        llmStatusBar.classList.add("hidden");
+        return;
+    }
+
+    const labels = {
+        ok: "AI summaries",
+        warning: "AI summaries — limited",
+        error: "AI summaries — unavailable",
+        off: "AI summaries — off",
+    };
+
+    llmStatusBar.className = `llm-status-bar level-${level}`;
+    llmStatusBar.innerHTML =
+        `<span class="llm-status-label">${labels[level] || "AI status"}</span>${msg}`;
+    llmStatusBar.classList.remove("hidden");
+}
+
+function renderLlmQueryNotice(notice) {
+    if (!llmQueryNotice) return;
+    if (!notice) {
+        llmQueryNotice.classList.add("hidden");
+        llmQueryNotice.textContent = "";
+        return;
+    }
+    llmQueryNotice.textContent = notice;
+    llmQueryNotice.classList.remove("hidden");
+}
+
+async function refreshLlmStatus() {
+    try {
+        const res = await fetchWithRetry(apiUrl("/api/health"), {}, 2, 8000);
+        if (!res.ok) return;
+        const data = await res.json();
+        renderLlmStatus(data.llm_status);
+    } catch {
+        /* health optional on cold start */
+    }
+}
+
 function resetFeedbackBar() {
     feedbackBar.classList.add("hidden");
     feedbackCommentWrap.classList.add("hidden");
@@ -196,6 +243,7 @@ function resetFeedbackBar() {
     feedbackUp.classList.remove("selected");
     feedbackDown.classList.remove("selected");
     lastQueryContext = null;
+    renderLlmQueryNotice(null);
 }
 
 function showFeedbackBar(data, question) {
@@ -287,6 +335,8 @@ async function runQuery(textFromChip) {
 
         renderTable(data.structured_result || data.result || null);
         showFeedbackBar(data, query);
+        if (data.llm_status) renderLlmStatus(data.llm_status);
+        renderLlmQueryNotice(data.llm_notice);
     } catch (err) {
         summaryBox.textContent = "Error while running query.";
         tableBox.innerHTML = "";
@@ -469,6 +519,7 @@ async function useDemoSession() {
             uploadStatusEl.textContent =
                 "Demo session empty or overwritten. Run: python seed_portfolio.py then refresh.";
         }
+        await refreshLlmStatus();
     } catch (err) {
         sessionIdEl.textContent = "offline";
         dataStatsEl.textContent = `API not reachable at ${API_BASE}. Wait ~60s and refresh (Render cold start).`;

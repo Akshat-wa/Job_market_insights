@@ -25,7 +25,7 @@ def llm_structured_summary(
     *,
     question: str = "",
     session_id: str = "",
-) -> str | None:
+) -> tuple[str | None, str | None]:
     """
     LLM-powered narrative that *only* looks at the structured_result
     coming back from the databases.
@@ -33,13 +33,13 @@ def llm_structured_summary(
     Used for the === Summary === section.
     """
     if not structured_result:
-        return None
+        return None, None
 
     llm_cfg = (cfg or {}).get("llm", {})
     if not llm_enabled(cfg):
-        return None
+        return None, None
     if llm_cfg.get("use_for_summary") is False:
-        return None
+        return None, None
 
     task = getattr(parsed, "task", None) or ""
     role = getattr(parsed, "role", None)
@@ -93,9 +93,9 @@ def llm_structured_summary(
         },
     )
     if not text:
-        return None
+        return None, None
 
-    return text.strip()
+    return text.strip(), _provider
 
 def maybe_llm_pointer(cfg: dict, parsed, location_hint: str | None = None) -> str | None:
     if not llm_enabled(cfg):
@@ -805,7 +805,7 @@ def main():
 
     # --------- Summary (LLM if possible, else rule-based) ---------
     try:
-        summary = llm_structured_summary(cfg, parsed, result.get("structured_result"))
+        summary, _prov = llm_structured_summary(cfg, parsed, result.get("structured_result"))
         if not summary:
             summary = format_narrative(plan.get("task"), parsed, result.get("structured_result"))
         print("\n=== Summary ===")

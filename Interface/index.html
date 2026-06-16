@@ -21,6 +21,8 @@
             </p>
         </header>
 
+        <div id="llmStatusBar" class="llm-status-bar hidden" role="status" aria-live="polite"></div>
+
         <section class="how-it-works" aria-label="How it works">
             <h2 class="how-title">How it works</h2>
             <ol class="how-steps">
@@ -114,6 +116,7 @@
                 <div id="summaryBox" class="summary-box">
                     Upload data or load the sample, then run a query.
                 </div>
+                <p id="llmQueryNotice" class="llm-query-notice hidden" role="status"></p>
                 <div id="feedbackBar" class="feedback-bar hidden" aria-live="polite">
                     <p class="feedback-prompt">Was this helpful?</p>
                     <p class="feedback-note">

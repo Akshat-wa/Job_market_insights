@@ -26,12 +26,13 @@ from run_query import (
     maybe_enrich_with_llm_integration,
     maybe_llm_freeform,
 )
+from LLM.llm_status import get_llm_status, get_query_notice
 from feedback.capture import capture_failure, feedback_enabled, list_failures, mark_failure
 from feedback.ratings import capture_rating, list_ratings, mark_rating, ratings_enabled
 
 load_dotenv()
 
-API_BUILD_ID = "2026-06-16-feedback-ratings-v5"
+API_BUILD_ID = "2026-06-16-llm-status-v6"
 CONFIG_PATH = os.getenv("CONFIG_PATH", "config.yaml")
 
 CFG = load_config(CONFIG_PATH)
@@ -179,6 +180,7 @@ def process_question(
                 context={"stage": "parse", "used_llm_parser": used_llm_parser},
                 fallback_used="static_message",
             )
+        sql_only = force_sql_fallback or not _llm_live_mode()
         return {
             "mode": "llm_freeform",
             "query_id": str(uuid.uuid4()),
@@ -189,6 +191,12 @@ def process_question(
                 "Try one of the example chips (e.g. Top 10 skills for data scientist in India)."
             ),
             "llm_degraded": force_sql_fallback,
+            "llm_status": get_llm_status(base_cfg, sql_only_mode=sql_only),
+            "llm_notice": get_query_notice(
+                base_cfg,
+                summary_source="llm" if freeform else "sql",
+                sql_only_mode=sql_only,
+            ),
             "feedback_id": feedback_id,
         }
 
@@ -206,10 +214,11 @@ def process_question(
     result["structured_result"] = structured
 
     llm_summary = None
+    summary_provider = None
     feedback_id = None
     if not force_sql_fallback:
         try:
-            llm_summary = llm_structured_summary(
+            llm_summary, summary_provider = llm_structured_summary(
                 cfg, parsed, structured,
                 question=question,
                 session_id=cfg["session_id"],
@@ -218,6 +227,14 @@ def process_question(
             print(f"[process_question] summary LLM failed: {e}")
 
     summary = llm_summary or format_narrative(plan.get("task"), parsed, structured)
+    sql_only = force_sql_fallback or not _llm_live_mode()
+    llm_status = get_llm_status(base_cfg, sql_only_mode=sql_only)
+    llm_notice = get_query_notice(
+        base_cfg,
+        summary_source="llm" if llm_summary else "sql",
+        summary_provider=summary_provider,
+        sql_only_mode=sql_only,
+    )
 
     if structured in (None, {}, []) and feedback_enabled(cfg):
         feedback_id = capture_failure(
@@ -240,6 +257,9 @@ def process_question(
         "structured_result": structured,
         "summary": summary,
         "summary_source": "llm" if llm_summary else "sql",
+        "summary_provider": summary_provider,
+        "llm_status": llm_status,
+        "llm_notice": llm_notice,
         "llm_degraded": force_sql_fallback,
         "feedback_id": feedback_id,
         "advisor_notes": None,
@@ -258,18 +278,21 @@ def health():
         db_ok = False
         err = str(e)
         storage = None
+    cfg = _runtime_cfg()
+    sql_only = not _llm_live_mode()
     return jsonify({
         "status": "ok" if db_ok else "degraded",
         "db": "ok" if db_ok else "error",
         "db_error": err,
         "storage": storage,
         "api_version": API_BUILD_ID,
-        "sql_only_mode": not _llm_live_mode(),
-        "llm_enabled": llm_enabled(_runtime_cfg()),
-        "llm_use_for_summary": (_runtime_cfg().get("llm") or {}).get("use_for_summary"),
+        "sql_only_mode": sql_only,
+        "llm_enabled": llm_enabled(cfg),
+        "llm_use_for_summary": (cfg.get("llm") or {}).get("use_for_summary"),
         "gemini_key_set": bool(os.getenv("GEMINI_API_KEY")),
         "xai_key_set": bool(os.getenv("XAI_API_KEY")),
         "llm_live_env": _llm_live_mode(),
+        "llm_status": get_llm_status(cfg, sql_only_mode=sql_only),
         "time": datetime.now(timezone.utc).isoformat(),
     })
 

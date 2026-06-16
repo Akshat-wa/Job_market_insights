@@ -70,11 +70,15 @@ def generate_with_fallback(
             llm = _make_llm(provider, model, json_mode, llm_cfg)
             text = (llm.generate(system, user) or "").strip()
             if text:
+                from LLM.llm_status import record_provider_outcome
+                record_provider_outcome(provider, "ok")
                 print(f"[LLM] OK via {provider} ({model})")
                 return text, provider
             print(f"[LLM] empty response from {provider}")
             attempts.append({"provider": provider, "model": model, "error": "empty response"})
         except Exception as e:
+            from LLM.llm_status import record_provider_error
+            record_provider_error(provider, str(e))
             print(f"[LLM] {provider} failed: {e}")
             attempts.append({"provider": provider, "model": model, "error": str(e)[:500]})
 

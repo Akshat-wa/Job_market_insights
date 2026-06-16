@@ -56,16 +56,26 @@ class GeminiLLM:
                 generation_config=generation_config
             )
             try:
-                return (getattr(resp, "text", None) or "").strip()
+                text = (getattr(resp, "text", None) or "").strip()
+                if text:
+                    from LLM.llm_status import record_provider_outcome
+                    record_provider_outcome("gemini", "ok")
+                return text
             except Exception as e:
                 if _is_quota_or_rate_limit(str(e), e):
+                    from LLM.llm_status import record_provider_outcome
+                    record_provider_outcome("gemini", "quota_exhausted", str(e))
                     print(f"[Gemini quota/rate limit on response.text] {str(e)[:120]}…")
                     return ""
                 raise
         except Exception as e:
             err = str(e)
             if _is_quota_or_rate_limit(err, e):
+                from LLM.llm_status import record_provider_outcome
+                record_provider_outcome("gemini", "quota_exhausted", err)
                 print(f"[Gemini quota exceeded — fallback] {err[:120]}…")
                 return ""
+            from LLM.llm_status import record_provider_error
+            record_provider_error("gemini", err)
             print(f"[Gemini error — fallback] {err[:120]}…")
             return ""

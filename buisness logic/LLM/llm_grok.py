@@ -51,18 +51,31 @@ class GrokLLM:
             choices = payload.get("choices") or []
             if not choices:
                 return ""
-            return (choices[0].get("message") or {}).get("content") or ""
+            text = (choices[0].get("message") or {}).get("content") or ""
+            text = text.strip()
+            if text:
+                from LLM.llm_status import record_provider_outcome
+                record_provider_outcome("grok", "ok")
+            return text
         except urllib.error.HTTPError as e:
             err_body = e.read().decode("utf-8", errors="replace")
             if e.code == 429 or "quota" in err_body.lower():
+                from LLM.llm_status import record_provider_outcome
+                record_provider_outcome("grok", "quota_exhausted", err_body)
                 print(f"[Grok quota/rate limit] {err_body[:120]}…")
                 return ""
+            from LLM.llm_status import record_provider_error
+            record_provider_error("grok", f"HTTP {e.code}: {err_body}")
             print(f"[Grok HTTP {e.code} — fallback] {err_body[:120]}…")
             return ""
         except Exception as e:
             err = str(e)
             if "429" in err or "quota" in err.lower() or "rate limit" in err.lower():
+                from LLM.llm_status import record_provider_outcome
+                record_provider_outcome("grok", "quota_exhausted", err)
                 print(f"[Grok quota exceeded] {err[:120]}…")
                 return ""
+            from LLM.llm_status import record_provider_error
+            record_provider_error("grok", err)
             print(f"[Grok error — fallback] {err[:120]}…")
             return ""
