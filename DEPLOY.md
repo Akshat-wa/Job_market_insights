@@ -276,10 +276,24 @@ Screenshot checklist:
 
 ## Optional: keep API warm (free)
 
-Use [https://cron-job.org](https://cron-job.org) to ping every 10 minutes:
-```
-GET https://YOUR-RENDER-URL.onrender.com/api/health
-```
+Render free tier **spins down after 15 minutes** with no traffic. The first request after that can take **30–60 seconds** (cold start). Your UI already retries, but a keep-alive ping avoids that for recruiters.
+
+### cron-job.org setup (≈2 minutes)
+
+1. Sign up at [cron-job.org](https://cron-job.org) (free).
+2. **Cronjobs** → **Create cronjob**.
+3. Fill in:
+   - **Title:** `Job Market Insights API keep-alive`
+   - **URL:** `https://job-market-insights-bgu8.onrender.com/api/health`
+   - **Schedule:** every **10 minutes** (e.g. `*/10 * * * *` or use the UI “every 10 minutes” preset)
+   - **Request method:** `GET`
+4. Save and enable the job.
+
+**Why 10 minutes?** Render’s idle timeout is 15 minutes — pinging every 10 minutes keeps the API awake with a 5-minute buffer.
+
+**Verify:** Open the health URL in a browser — you should see `"status": "ok"` and `"db": "ok"` ([live example](https://job-market-insights-bgu8.onrender.com/api/health)).
+
+**Note:** This uses a small part of Render’s **750 free instance-hours/month** — one ping every 10 minutes is fine for a portfolio demo.
 
 ---
 
