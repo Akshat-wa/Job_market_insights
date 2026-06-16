@@ -3,7 +3,6 @@ services:
   - type: web
     name: job-insights-api
     runtime: docker
-    rootDir: buisness logic
     dockerfilePath: ./Dockerfile
     plan: free
     region: singapore

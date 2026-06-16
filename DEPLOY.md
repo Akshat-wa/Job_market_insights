@@ -161,9 +161,10 @@ Visit [http://127.0.0.1:5500](http://127.0.0.1:5500)
 ### Step 1: New Web Service
 - Render Dashboard → **New +** → **Web Service**
 - Connect your GitHub repo
-- **Root directory:** `buisness logic`
-- **Runtime:** Docker (uses `buisness logic/Dockerfile`)
+- **Root directory:** leave empty (repo root) — `Dockerfile` at repo root copies `buisness logic/`
+- **Runtime:** Docker
 - **Instance type:** Free
+- **Region:** Singapore (match your Neon region)
 
 ### Step 2: Environment variables (Render → Environment)
 
@@ -263,6 +264,7 @@ Screenshot checklist:
 | Problem | Fix |
 |---------|-----|
 | `db: error` on health | Check `DATABASE_URL` in Render; Neon IP allowlist is open by default |
+| `Dockerfile: no such file` | Use repo-root `Dockerfile` (push latest) or set Root Directory to `buisness logic` |
 | `GEMINI_API_KEY not set` | Add env var in Render, redeploy |
 | UI can't reach API | Set `window.API_BASE` to Render URL; check browser console |
 | Cold start timeout | Retry after 60s; upgrade Render plan or add uptime ping (cron-job.org free) |
