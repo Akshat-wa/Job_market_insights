@@ -149,7 +149,7 @@ def capture_failure(
         record["diagnosis"] = diagnosis
 
     fid = _append_record(path, record)
-    print(f"[feedback] captured {kind} id={fid[:8]}… → {path}")
+    print(f"[feedback] captured {kind} id={fid[:8]}... -> {path}")
     return fid
 
 

@@ -114,6 +114,23 @@
                 <div id="summaryBox" class="summary-box">
                     Upload data or load the sample, then run a query.
                 </div>
+                <div id="feedbackBar" class="feedback-bar hidden" aria-live="polite">
+                    <p class="feedback-prompt">Was this helpful?</p>
+                    <p class="feedback-note">
+                        Errors are auto-diagnosed; your ratings are <strong>reviewed by a human</strong>
+                        before parser or summary changes ship.
+                    </p>
+                    <div class="feedback-actions">
+                        <button id="feedbackUp" class="feedback-btn" type="button" aria-label="Yes, helpful">👍 Yes</button>
+                        <button id="feedbackDown" class="feedback-btn" type="button" aria-label="No, not helpful">👎 No</button>
+                    </div>
+                    <div id="feedbackCommentWrap" class="feedback-comment-wrap hidden">
+                        <label for="feedbackComment" class="feedback-comment-label">What was wrong? (optional)</label>
+                        <textarea id="feedbackComment" class="feedback-comment" rows="2" placeholder="e.g. wrong job count, summary too vague…"></textarea>
+                        <button id="feedbackSubmit" class="ghost-btn feedback-submit" type="button">Send feedback</button>
+                    </div>
+                    <p id="feedbackStatus" class="feedback-status"></p>
+                </div>
             </section>
 
             <section class="panel" aria-labelledby="data-results-heading">
@@ -128,6 +145,7 @@
 
         <footer class="site-footer">
             <p class="footer-tagline">Natural-language hiring analytics &middot; Portfolio demo</p>
+            <p class="footer-note">Anonymous feedback improves parsing and summaries. Humans review negative ratings weekly.</p>
             <p class="footer-links">
                 <a href="https://github.com/Akshat-wa/Job_market_insights" target="_blank" rel="noopener noreferrer">View source on GitHub</a>
                 <span class="footer-sep" aria-hidden="true">&middot;</span>

@@ -6,6 +6,7 @@ buisness logic/.env
 buisness logic/config_old.yaml
 buisness logic/config_new.yaml
 buisness logic/feedback/failures.jsonl
+buisness logic/feedback/ratings.jsonl
 buisness logic/.venv/
 **/__pycache__/
 *.pyc

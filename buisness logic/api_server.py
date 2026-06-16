@@ -27,10 +27,11 @@ from run_query import (
     maybe_llm_freeform,
 )
 from feedback.capture import capture_failure, feedback_enabled, list_failures, mark_failure
+from feedback.ratings import capture_rating, list_ratings, mark_rating, ratings_enabled
 
 load_dotenv()
 
-API_BUILD_ID = "2026-06-16-llm-env-v4"
+API_BUILD_ID = "2026-06-16-feedback-ratings-v5"
 CONFIG_PATH = os.getenv("CONFIG_PATH", "config.yaml")
 
 CFG = load_config(CONFIG_PATH)
@@ -180,6 +181,7 @@ def process_question(
             )
         return {
             "mode": "llm_freeform",
+            "query_id": str(uuid.uuid4()),
             "used_llm_parser": used_llm_parser,
             "session_id": cfg["session_id"],
             "answer": freeform or (
@@ -230,6 +232,7 @@ def process_question(
 
     return {
         "mode": "structured",
+        "query_id": str(uuid.uuid4()),
         "used_llm_parser": used_llm_parser,
         "session_id": cfg["session_id"],
         "parsed": asdict(parsed),
@@ -508,6 +511,80 @@ def api_feedback_review(failure_id: str):
     full_id = next((r["id"] for r in rows if r.get("id", "").startswith(failure_id)), failure_id)
     if not mark_failure(full_id, status=status, notes=notes, cfg=cfg):
         return jsonify({"error": "failure id not found"}), 404
+    return jsonify({"ok": True, "id": full_id, "status": status})
+
+
+@app.post("/api/feedback/rating")
+def api_feedback_rating():
+    data = request.get_json(force=True, silent=True) or {}
+    cfg = _runtime_cfg()
+    if not ratings_enabled(cfg):
+        return jsonify({"error": "ratings disabled"}), 403
+
+    try:
+        rating = int(data.get("rating", 0))
+    except (TypeError, ValueError):
+        return jsonify({"error": "rating must be 1 or -1"}), 400
+
+    if rating not in (1, -1):
+        return jsonify({"error": "rating must be 1 or -1"}), 400
+
+    try:
+        result = capture_rating(
+            cfg,
+            rating=rating,
+            question=(data.get("question") or "").strip(),
+            session_id=(data.get("session_id") or DEFAULT_SESSION).strip(),
+            query_id=(data.get("query_id") or "").strip(),
+            summary=(data.get("summary") or "").strip(),
+            task=(data.get("task") or "").strip(),
+            summary_source=(data.get("summary_source") or "").strip(),
+            mode=(data.get("mode") or "").strip(),
+            comment=(data.get("comment") or "").strip(),
+            linked_failure_id=(data.get("feedback_id") or "").strip(),
+        )
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+    if not result:
+        return jsonify({"error": "could not save rating"}), 500
+
+    return jsonify({
+        "ok": True,
+        "rating_id": result["id"],
+        "linked_failure_id": result.get("linked_failure_id"),
+        "message": (
+            "Thanks — a human reviews negative feedback weekly before any parser or prompt changes ship."
+            if rating < 0
+            else "Thanks for the feedback."
+        ),
+    })
+
+
+@app.get("/api/feedback/ratings")
+def api_feedback_ratings_list():
+    status = (request.args.get("status") or "open").strip()
+    limit = min(int(request.args.get("limit", 50)), 200)
+    negative_only = request.args.get("negative_only", "").lower() in ("1", "true", "yes")
+    rows = list_ratings(
+        _runtime_cfg(),
+        status=status,
+        limit=limit,
+        negative_only=negative_only,
+    )
+    return jsonify({"ratings": rows, "count": len(rows)})
+
+
+@app.post("/api/feedback/ratings/<rating_id>/review")
+def api_feedback_rating_review(rating_id: str):
+    data = request.get_json(force=True, silent=True) or {}
+    status = (data.get("status") or "reviewed").strip()
+    notes = (data.get("notes") or "").strip()
+    cfg = _runtime_cfg()
+    rows = list_ratings(cfg, status="all", limit=10_000)
+    full_id = next((r["id"] for r in rows if r.get("id", "").startswith(rating_id)), rating_id)
+    if not mark_rating(full_id, status=status, notes=notes, cfg=cfg):
+        return jsonify({"error": "rating id not found"}), 404
     return jsonify({"ok": True, "id": full_id, "status": status})
 
 

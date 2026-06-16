@@ -403,6 +403,116 @@ body::before {
     color: var(--text);
 }
 
+/* ── Response feedback ─────────────────────────────────────────── */
+.feedback-bar {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.feedback-bar.hidden {
+    display: none;
+}
+
+.feedback-prompt {
+    margin: 0 0 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.feedback-note {
+    margin: 0 0 12px;
+    font-size: 12px;
+    color: var(--text-subtle);
+    line-height: 1.5;
+}
+
+.feedback-note strong {
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.feedback-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.feedback-btn {
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-elevated);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition);
+}
+
+.feedback-btn:hover:not(:disabled) {
+    background: var(--surface-hover);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.feedback-btn:disabled,
+.feedback-btn.selected {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.feedback-btn.selected {
+    border-color: var(--text-muted);
+}
+
+.feedback-comment-wrap {
+    margin-top: 12px;
+}
+
+.feedback-comment-wrap.hidden {
+    display: none;
+}
+
+.feedback-comment-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.feedback-comment {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-elevated);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 13px;
+    resize: vertical;
+    min-height: 56px;
+}
+
+.feedback-submit {
+    margin-top: 8px;
+}
+
+.feedback-status {
+    margin: 10px 0 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    min-height: 1.2em;
+}
+
+.footer-note {
+    margin: 0 0 10px;
+    font-size: 11px;
+    color: var(--text-subtle);
+    line-height: 1.5;
+}
+
 /* ── Tables ────────────────────────────────────────────────────── */
 .table-box {
     max-height: 320px;

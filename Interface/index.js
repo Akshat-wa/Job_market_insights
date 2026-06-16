@@ -18,8 +18,17 @@ const combinedFileInput = document.getElementById("combinedFile");
 const postingsFileInput = document.getElementById("postingsFile");
 const skillsFileInput = document.getElementById("skillsFile");
 
+const feedbackBar = document.getElementById("feedbackBar");
+const feedbackUp = document.getElementById("feedbackUp");
+const feedbackDown = document.getElementById("feedbackDown");
+const feedbackCommentWrap = document.getElementById("feedbackCommentWrap");
+const feedbackComment = document.getElementById("feedbackComment");
+const feedbackSubmit = document.getElementById("feedbackSubmit");
+const feedbackStatus = document.getElementById("feedbackStatus");
+
 let sessionId = localStorage.getItem("jmi_session_id") || null;
 let isRunning = false;
+let lastQueryContext = null;
 
 function apiUrl(path) {
     return `${API_BASE.replace(/\/$/, "")}${path}`;
@@ -177,6 +186,74 @@ function renderTable(structured) {
     });
 }
 
+function resetFeedbackBar() {
+    feedbackBar.classList.add("hidden");
+    feedbackCommentWrap.classList.add("hidden");
+    feedbackComment.value = "";
+    feedbackStatus.textContent = "";
+    feedbackUp.disabled = false;
+    feedbackDown.disabled = false;
+    feedbackUp.classList.remove("selected");
+    feedbackDown.classList.remove("selected");
+    lastQueryContext = null;
+}
+
+function showFeedbackBar(data, question) {
+    lastQueryContext = {
+        query_id: data.query_id || "",
+        question,
+        session_id: data.session_id || sessionId,
+        summary: data.summary || data.answer || "",
+        task: (data.plan && data.plan.task) || "",
+        summary_source: data.summary_source || "",
+        mode: data.mode || "",
+        feedback_id: data.feedback_id || "",
+    };
+    feedbackBar.classList.remove("hidden");
+    feedbackCommentWrap.classList.add("hidden");
+    feedbackComment.value = "";
+    feedbackStatus.textContent = "";
+    feedbackUp.disabled = false;
+    feedbackDown.disabled = false;
+    feedbackUp.classList.remove("selected");
+    feedbackDown.classList.remove("selected");
+}
+
+async function submitRating(rating, comment) {
+    if (!lastQueryContext) return;
+
+    feedbackUp.disabled = true;
+    feedbackDown.disabled = true;
+    feedbackStatus.textContent = "Saving feedback…";
+
+    try {
+        const res = await fetch(apiUrl("/api/feedback/rating"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                rating,
+                comment: comment || "",
+                ...lastQueryContext,
+            }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+
+        if (rating > 0) {
+            feedbackUp.classList.add("selected");
+        } else {
+            feedbackDown.classList.add("selected");
+        }
+        feedbackCommentWrap.classList.add("hidden");
+        feedbackStatus.textContent =
+            data.message || "Thanks — your feedback was recorded.";
+    } catch (err) {
+        feedbackStatus.textContent = String(err);
+        feedbackUp.disabled = false;
+        feedbackDown.disabled = false;
+    }
+}
+
 async function runQuery(textFromChip) {
     if (isRunning) return;
 
@@ -190,6 +267,7 @@ async function runQuery(textFromChip) {
 
     summaryBox.textContent = "Running query…";
     tableBox.innerHTML = '<div class="placeholder">Fetching data…</div>';
+    resetFeedbackBar();
 
     try {
         await ensureSession();
@@ -208,6 +286,7 @@ async function runQuery(textFromChip) {
             "Query completed. No summary returned.";
 
         renderTable(data.structured_result || data.result || null);
+        showFeedbackBar(data, query);
     } catch (err) {
         summaryBox.textContent = "Error while running query.";
         tableBox.innerHTML = "";
@@ -215,6 +294,7 @@ async function runQuery(textFromChip) {
         div.className = "placeholder";
         div.textContent = String(err);
         tableBox.appendChild(div);
+        resetFeedbackBar();
     } finally {
         isRunning = false;
         runButton.disabled = false;
@@ -342,6 +422,22 @@ quickChips.forEach((chip) => {
         queryInput.value = q;
         runQuery(q);
     });
+});
+
+feedbackUp.addEventListener("click", () => {
+    if (!lastQueryContext || feedbackUp.disabled) return;
+    submitRating(1, "");
+});
+
+feedbackDown.addEventListener("click", () => {
+    if (!lastQueryContext || feedbackDown.disabled) return;
+    feedbackCommentWrap.classList.remove("hidden");
+    feedbackStatus.textContent = "Tell us what missed the mark (optional), then send.";
+});
+
+feedbackSubmit.addEventListener("click", () => {
+    if (!lastQueryContext || feedbackDown.disabled) return;
+    submitRating(-1, feedbackComment.value.trim());
 });
 
 async function tryDemoSession() {

@@ -54,3 +54,7 @@ feedback:
   auto_diagnose: true
   diagnosis_provider: auto
   log_path: feedback/failures.jsonl
+  # Thumbs up/down on answers — negative ratings escalate to human review queue
+  ratings_enabled: true
+  ratings_log_path: feedback/ratings.jsonl
+  escalate_negative_to_failure: true
