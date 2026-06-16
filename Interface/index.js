@@ -25,6 +25,24 @@ function apiUrl(path) {
     return `${API_BASE.replace(/\/$/, "")}${path}`;
 }
 
+async function fetchWithRetry(url, options = {}, retries = 3, delayMs = 12000) {
+    let lastErr;
+    for (let i = 0; i < retries; i++) {
+        try {
+            const res = await fetch(url, options);
+            return res;
+        } catch (err) {
+            lastErr = err;
+            if (i < retries - 1) {
+                uploadStatusEl.textContent =
+                    `Waking API… retry ${i + 2}/${retries} (Render free tier cold start)`;
+                await new Promise((r) => setTimeout(r, delayMs));
+            }
+        }
+    }
+    throw lastErr;
+}
+
 async function ensureSession() {
     if (sessionId) {
         sessionIdEl.textContent = sessionId.slice(0, 8) + "…";
@@ -175,7 +193,7 @@ async function runQuery(textFromChip) {
 
     try {
         await ensureSession();
-        const res = await fetch(apiUrl("/api/query"), {
+        const res = await fetchWithRetry(apiUrl("/api/query"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ question: query, session_id: sessionId }),
@@ -328,7 +346,7 @@ quickChips.forEach((chip) => {
 
 async function tryDemoSession() {
     try {
-        const res = await fetch(apiUrl("/api/session/demo/stats"));
+        const res = await fetchWithRetry(apiUrl("/api/session/demo/stats"));
         if (!res.ok) return false;
         const data = await res.json();
         return (data.jobs || 0) >= 5000;
@@ -357,7 +375,7 @@ async function useDemoSession() {
         }
     } catch (err) {
         sessionIdEl.textContent = "offline";
-        dataStatsEl.textContent = `API not reachable at ${API_BASE}. Start api_server.py locally.`;
+        dataStatsEl.textContent = `API not reachable at ${API_BASE}. Wait ~60s and refresh (Render cold start).`;
         uploadStatusEl.textContent = String(err);
     }
 })();
