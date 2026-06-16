@@ -1,0 +1,4 @@
+job_link,job_skills
+https://example.com/jobs/1,"python, sql, machine learning, pandas"
+https://example.com/jobs/2,"java, spring, kubernetes, sql"
+https://example.com/jobs/3,"python, pytorch, tensorflow, docker"

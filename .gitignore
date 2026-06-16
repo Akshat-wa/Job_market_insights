@@ -1,0 +1,10 @@
+buisness logic/data/linkedin_job_postings.csv
+buisness logic/data/job_skills.csv
+buisness logic/data/master_resumes.json
+buisness logic/data/portfolio_jobs_combined.csv
+buisness logic/.env
+buisness logic/feedback/failures.jsonl
+buisness logic/.venv/
+**/__pycache__/
+*.pyc
+.DS_Store

@@ -1,0 +1,25 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: job-insights-api
+    runtime: docker
+    rootDir: buisness logic
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: singapore
+    healthCheckPath: /api/health
+    envVars:
+      - key: CONFIG_PATH
+        value: config.yaml
+      - key: PORT
+        value: "8000"
+      - key: LLM_LIVE
+        value: "1"
+      - key: DATABASE_URL
+        sync: false
+      - key: CANDIDATES_DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: XAI_API_KEY
+        sync: false

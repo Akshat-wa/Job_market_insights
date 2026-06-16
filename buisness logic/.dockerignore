@@ -1,0 +1,13 @@
+.venv
+__pycache__
+*.pyc
+.env
+.env.*
+!.env.example
+data/portfolio_jobs_combined.csv
+data/linkedin_job_postings.csv
+data/job_skills.csv
+data/master_resumes.jsonl
+feedback/failures.jsonl
+*.csv
+.git

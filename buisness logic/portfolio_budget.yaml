@@ -1,0 +1,31 @@
+# Portfolio storage budget (Neon free tier = 512 MB hard limit)
+portfolio:
+  # Target total demo footprint in PostgreSQL (jobs + candidates)
+  target_demo_db_mb: 100
+  # Synthetic jobs CSV on disk (~12 MB → ~55–65 MB in jobs DB with 5 skills/job)
+  jobs_csv_target_mb: 12
+  # Skills listed per job in generated CSV (lower = much smaller job_skills table)
+  skills_per_job_min: 4
+  skills_per_job_max: 5
+  # Use up to this many MB from master_resumes.jsonl
+  candidates_jsonl_max_mb: 16
+  # Reserved for recruiter uploads after demo seed
+  upload_headroom_mb: 80
+  demo_session_id: demo
+  session_ttl_hours: 24
+  max_upload_rows: 5000
+  max_upload_file_mb: 5
+  # UI / health: treat demo as valid when at least this many jobs
+  min_demo_jobs: 5000
+
+upload:
+  max_file_bytes: 5242880   # 5 MB
+  max_rows: 5000
+
+# Regex parser first; LLM only when quota allows (free tier ≈ 20 calls/day)
+parser:
+  prefer_llm: false
+
+llm:
+  use_for_summary: false
+  use_for_enrichment: false

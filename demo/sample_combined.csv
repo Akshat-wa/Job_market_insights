@@ -1,0 +1,9 @@
+job_link,job_title,company,job_location,job_skills
+https://example.com/jobs/1,Data Scientist,Acme Analytics,Bangalore India,"python, sql, machine learning, pandas"
+https://example.com/jobs/2,Backend Engineer,CloudNine Tech,Hyderabad India,"java, spring, kubernetes, sql"
+https://example.com/jobs/3,Machine Learning Engineer,AI Labs,Mumbai India,"python, pytorch, tensorflow, docker"
+https://example.com/jobs/4,Data Engineer,DataPipe Inc,Delhi India,"python, spark, sql, aws"
+https://example.com/jobs/5,Frontend Engineer,PixelSoft,Pune India,"javascript, react, html, css"
+https://example.com/jobs/6,DevOps Engineer,InfraWorks,Bangalore India,"docker, kubernetes, aws, linux"
+https://example.com/jobs/7,Data Scientist,Insight Co,Chennai India,"python, r, statistics, sql"
+https://example.com/jobs/8,Software Engineer,CodeForge,San Francisco United States,"python, javascript, git, sql"
