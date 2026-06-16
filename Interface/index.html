@@ -3,24 +3,32 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Ask hiring questions in plain English over job market and candidate data." />
     <title>Job Market Insights</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
     <div class="app">
-        <h1 class="title">Job Market Insights</h1>
-        <p class="subtitle">
-            Upload job CSV data and ask hiring questions in plain English.
-            Candidate matching uses bundled demo resumes.
-        </p>
+        <header class="site-header">
+            <div class="brand-mark" aria-hidden="true">JM</div>
+            <h1 class="title">Job Market Insights</h1>
+            <p class="subtitle">
+                Upload job data and ask hiring questions in plain English.
+                Candidate matching uses bundled demo resumes.
+            </p>
+        </header>
 
-        <div class="panel upload-panel">
-            <h2 class="panel-title">1. Your data</h2>
+        <section class="panel upload-panel" aria-labelledby="data-heading">
+            <div class="panel-header">
+                <span class="step-badge">1</span>
+                <h2 id="data-heading" class="panel-title">Your data</h2>
+            </div>
+
             <div class="session-row">
-                <span class="session-label">Session:</span>
+                <span class="session-label">Session</span>
                 <code id="sessionId" class="session-id">starting…</code>
                 <button id="newSessionBtn" class="ghost-btn" type="button">New session</button>
             </div>
@@ -29,7 +37,7 @@
             <div class="upload-grid">
                 <label class="upload-box">
                     <span class="upload-title">Combined CSV</span>
-                    <span class="upload-hint">postings + skills in one file</span>
+                    <span class="upload-hint">Postings and skills in one file</span>
                     <input id="combinedFile" type="file" accept=".csv,text/csv" />
                 </label>
                 <label class="upload-box">
@@ -39,7 +47,7 @@
                 </label>
                 <label class="upload-box">
                     <span class="upload-title">Skills CSV</span>
-                    <span class="upload-hint">job_link + skills column</span>
+                    <span class="upload-hint">job_link and skills column</span>
                     <input id="skillsFile" type="file" accept=".csv,text/csv" />
                 </label>
             </div>
@@ -47,28 +55,33 @@
             <div class="upload-actions">
                 <button id="uploadBtn" class="run-btn" type="button">Upload &amp; ingest</button>
                 <button id="loadDemoBtn" class="ghost-btn" type="button">Load sample (8 jobs)</button>
-                <button id="usePortfolioBtn" class="ghost-btn" type="button">Use portfolio demo (~50k jobs)</button>
+                <button id="usePortfolioBtn" class="ghost-btn" type="button">Use portfolio demo (~100k jobs)</button>
             </div>
-            <div id="uploadStatus" class="upload-status"></div>
+            <div id="uploadStatus" class="upload-status" role="status" aria-live="polite"></div>
             <p class="fine-print">
                 Flexible columns supported (e.g. <code>title</code> instead of <code>job_title</code>).
-                Missing <code>job_link</code>? Synthetic keys are generated from title+company+location.
+                Missing <code>job_link</code>? Synthetic keys are generated from title, company, and location.
             </p>
-        </div>
+        </section>
 
-        <div class="panel">
-            <h2 class="panel-title">2. Ask a question</h2>
+        <section class="panel" aria-labelledby="query-heading">
+            <div class="panel-header">
+                <span class="step-badge">2</span>
+                <h2 id="query-heading" class="panel-title">Ask a question</h2>
+            </div>
+
             <div class="query-row">
                 <input
                     id="queryInput"
                     class="query-input"
                     type="text"
                     placeholder="e.g. Top 10 skills for data scientist in India"
+                    autocomplete="off"
                 />
                 <button id="runButton" class="run-btn" type="button">Run</button>
             </div>
 
-            <div class="chips-row">
+            <div class="chips-row" role="group" aria-label="Example questions">
                 <button class="quick-chip" type="button" data-query="Top 10 skills for data scientist in India">
                     Top skills for data scientist
                 </button>
@@ -82,23 +95,31 @@
                     Demo candidate readiness
                 </button>
             </div>
-        </div>
+        </section>
 
         <div class="results">
-            <div class="panel">
-                <h2 class="panel-title">Summary</h2>
+            <section class="panel" aria-labelledby="summary-heading">
+                <div class="panel-header">
+                    <h2 id="summary-heading" class="panel-title">Summary</h2>
+                </div>
                 <div id="summaryBox" class="summary-box">
                     Upload data or load the sample, then run a query.
                 </div>
-            </div>
+            </section>
 
-            <div class="panel">
-                <h2 class="panel-title">Structured data</h2>
+            <section class="panel" aria-labelledby="data-results-heading">
+                <div class="panel-header">
+                    <h2 id="data-results-heading" class="panel-title">Structured data</h2>
+                </div>
                 <div id="tableBox" class="table-box">
                     <div class="placeholder">Results appear here.</div>
                 </div>
-            </div>
+            </section>
         </div>
+
+        <footer class="site-footer">
+            Natural-language hiring analytics &middot; Portfolio demo
+        </footer>
     </div>
 
     <script src="config.js"></script>
