@@ -483,6 +483,41 @@ body::before {
     letter-spacing: 0.06em;
 }
 
+/* ── How it works ──────────────────────────────────────────────── */
+.how-it-works {
+    margin-bottom: 24px;
+    padding: 18px 22px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+}
+
+.how-title {
+    margin: 0 0 12px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.how-steps {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+}
+
+.how-steps li {
+    margin-bottom: 4px;
+}
+
+.how-steps strong {
+    color: var(--text);
+    font-weight: 600;
+}
+
 /* ── Footer ────────────────────────────────────────────────────── */
 .site-footer {
     margin-top: 40px;
@@ -490,6 +525,19 @@ body::before {
     border-top: 1px solid var(--border);
     text-align: center;
     font-size: 12px;
+    color: var(--text-subtle);
+}
+
+.footer-tagline {
+    margin: 0 0 8px;
+}
+
+.footer-links {
+    margin: 0;
+}
+
+.footer-sep {
+    margin: 0 8px;
     color: var(--text-subtle);
 }
 

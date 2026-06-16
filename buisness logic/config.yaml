@@ -12,11 +12,11 @@ candidate_legitimacy_csv: "data/candidate_skill_legitimacy_scores_transformer.cs
 
 jobs_db:
   backend: "postgres"
-  dsn: "host=localhost port=5433 dbname=job_market user=postgres password=612403"
+  dsn: "host=localhost port=5433 dbname=job_market user=postgres password=changeme"
 
 candidates_db:
   backend: "postgres"
-  dsn: "host=localhost port=5433 dbname=candidates user=postgres password=612403"
+  dsn: "host=localhost port=5433 dbname=candidates user=postgres password=changeme"
 
 
 llm:

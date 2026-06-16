@@ -16,11 +16,11 @@ def load_dsn(config_path: str, db_key: str) -> str:
 
       jobs_db:
         backend: "postgres"
-        dsn: "host=192.168.47.101 port=5433 dbname=job_market user=postgres password=612403"
+        dsn: "host=localhost port=5433 dbname=job_market user=postgres password=changeme"
 
       candidates_db:
         backend: "postgres"
-        dsn: "host=localhost port=5432 dbname=candidates user=postgres password=abc123def4"
+        dsn: "host=localhost port=5432 dbname=candidates user=postgres password=changeme"
     """
     with open(config_path, "r", encoding="utf-8") as f:
         cfg = yaml.safe_load(f)

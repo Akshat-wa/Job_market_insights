@@ -3,6 +3,8 @@ buisness logic/data/job_skills.csv
 buisness logic/data/master_resumes.json
 buisness logic/data/portfolio_jobs_combined.csv
 buisness logic/.env
+buisness logic/config_old.yaml
+buisness logic/config_new.yaml
 buisness logic/feedback/failures.jsonl
 buisness logic/.venv/
 **/__pycache__/
