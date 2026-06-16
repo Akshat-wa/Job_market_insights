@@ -1,0 +1,6 @@
+title,company,location,skills
+Data Analyst,BrightMetrics,Bangalore India,"sql, excel, python, tableau, power bi"
+Data Scientist,HealthAI,Hyderabad India,"python, machine learning, pandas, nlp, sql"
+DevOps Engineer,ShipFast,Pune India,"docker, ci/cd, aws, kubernetes, bash"
+Frontend Engineer,UI Studio,Delhi India,"react, typescript, figma, css, javascript"
+Machine Learning Engineer,AutoML Labs,Chennai India,"python, tensorflow, mlflow, docker, sql"

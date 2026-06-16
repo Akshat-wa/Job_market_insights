@@ -1,0 +1,4 @@
+url,position,employer,city,required_skills
+https://demo.jmi/alt/01,Research Scientist,DeepMind Labs,London United Kingdom,"python, pytorch, research, mathematics"
+https://demo.jmi/alt/02,Cloud Architect,SkyScale,Dubai UAE,"aws, azure, terraform, networking, security"
+https://demo.jmi/alt/03,iOS Developer,MobileFirst,Bangalore India,"swift, ios, xcode, rest api, git"

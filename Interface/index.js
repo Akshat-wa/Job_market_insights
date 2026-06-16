@@ -237,7 +237,7 @@ async function uploadFiles({ combined, postings, skills, demo = false }) {
         form.append("mode", "replace");
 
         if (demo) {
-            const res = await fetch("../demo/sample_combined.csv");
+            const res = await fetch("demo/sample_combined.csv");
             if (!res.ok) throw new Error("Could not fetch sample CSV");
             const blob = await res.blob();
             form.append("combined_file", blob, "sample_combined.csv");
